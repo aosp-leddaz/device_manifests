@@ -44,9 +44,6 @@ OPTIONS:
     -s, --sixtyfour-bits
         Builds a 64-bit only package if supported by the device tree
 
-    -t, --tiramisu
-        Sets STATIX_BUILD_TYPE=TIRAMISU
-
     -u, --update-api
         Update APIs
 
@@ -106,8 +103,8 @@ JOBS=8
 
 # Setup getopt.
 long_opts="clean_build,debug,help,image:,jobs:,log_file:,module:,"
-long_opts+="sixtyfour-bits,package-type:,update-api,build_variant:,tiramisu"
-getopt_cmd=$(getopt -o cdhi:j:k:l:m:p:suv:t --long "$long_opts" \
+long_opts+="sixtyfour-bits,package-type:,update-api,build_variant:"
+getopt_cmd=$(getopt -o cdhi:j:k:l:m:p:suv: --long "$long_opts" \
             -n $(basename $0) -- "$@") || \
             { echo -e "\nERROR: Getopt failed. Extra args\n"; usage; exit 1;}
 
@@ -124,7 +121,6 @@ while true; do
         -m|--module) MODULE="$2"; shift;;
         -p|--package-type) PKG="$2"; shift;;
         -s|--sixtyfour-bits) SIXTYFOUR_BITS="true";;
-        -t|--tiramisu) TIRAMISU="true";;
         -u|--update-api) UPDATE_API="true";;
         -v|--build_variant) VARIANT="$2"; shift;;
         --) shift; break;;
@@ -182,14 +178,10 @@ else
     fi
 fi
 
-if [ "$TIRAMISU" = "true" ]; then
-    export STATIX_BUILD_TYPE=TIRAMISU
-fi
-
 if [ "$SIXTYFOUR_BITS" = "true" ]; then
-    lunch statix_${TARGET}_64-$VARIANT || exit_on_error
+    lunch aosp_${TARGET}_64-$VARIANT || exit_on_error
 else
-    lunch statix_$TARGET-$VARIANT || exit_on_error
+    lunch aosp_$TARGET-$VARIANT || exit_on_error
 fi
 
 m installclean
